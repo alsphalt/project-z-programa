@@ -1,4 +1,15 @@
+import { builtinModules } from "node:module";
 import type { NextConfig } from "next";
+
+const nodeBuiltinExternals = Object.fromEntries(
+  builtinModules.flatMap((moduleName) => {
+    const bareName = moduleName.replace(/^node:/, "");
+    return [
+      [bareName, `commonjs ${bareName}`],
+      [`node:${bareName}`, `commonjs node:${bareName}`],
+    ];
+  }),
+);
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -31,9 +42,21 @@ const nextConfig: NextConfig = {
     "/*": ["./db/schema.sql", "./db/migrations/**/*.sql"],
   },
   poweredByHeader: false,
+  webpack(config, { isServer }) {
+    if (isServer) {
+      config.externals.push({
+        ...nodeBuiltinExternals,
+        pg: "commonjs pg",
+        "pg-connection-string": "commonjs pg-connection-string",
+        pgpass: "commonjs pgpass",
+      });
+    }
+    return config;
+  },
   serverExternalPackages: [
     "ws",
     "pg",
+    "pg-connection-string",
     "@neondatabase/serverless",
     "@prisma/client",
     "@aws-sdk/client-s3",
