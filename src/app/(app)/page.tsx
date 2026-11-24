@@ -5,8 +5,13 @@ import { useState } from "react";
 import {
   Activity,
   AlertTriangle,
+  CalendarClock,
+  CheckCircle2,
+  Clock3,
   Cpu,
   Database,
+  FileWarning,
+  GitBranch,
   HardDrive,
   Play,
   Radar,
@@ -60,6 +65,16 @@ type DeploymentRow = {
   error: string | null;
 };
 
+type SyncOverview = {
+  drafts: number;
+  conflicts: number;
+  events: number;
+  deployment: number;
+  lastScanAt: string | null;
+  syncIntervalSeconds: number;
+  lock: { owner: string; expiresAt: string } | null;
+};
+
 export default function OverviewPage() {
   const { activeServer, activeId, loading } = useServers();
   const { push } = useToast();
@@ -71,6 +86,7 @@ export default function OverviewPage() {
     activeId ? `/api/deployments?serverId=${activeId}` : null,
     { refreshMs: 30_000 },
   );
+  const syncOverview = useApi<SyncOverview>(activeId ? `/api/servers/${activeId}/sync` : null, { refreshMs: 30_000 });
 
   const run = async (key: string, fn: () => Promise<unknown>, message: string) => {
     setBusy(key);
@@ -198,6 +214,94 @@ export default function OverviewPage() {
           hint={`${data?.index.folders ?? 0} folders · ${data?.sync.changedFiles ?? 0} changed in 24h`}
           tone="accent"
         />
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+        <Panel
+          className="lg:col-span-2"
+          title="Upcoming work"
+          subtitle="Live queue and the next scheduled reconciliation"
+          actions={<Link href="/sync" className="text-[11px] text-accent-soft hover:underline">Open sync →</Link>}
+        >
+          {syncOverview.loading ? (
+            <div className="flex items-center gap-2 py-2 text-xs text-slate-500"><Spinner /> Loading work queue…</div>
+          ) : syncOverview.error ? (
+            <p className="text-xs text-rose-300">Could not load pending work: {syncOverview.error}</p>
+          ) : (
+            <div className="space-y-3">
+              {(() => {
+                const pending = syncOverview.data;
+                const work = [
+                  { label: "Drafts awaiting deployment", count: pending?.drafts ?? 0, icon: <Rocket className="h-4 w-4" />, href: "/editor", tone: "text-amber-300" },
+                  { label: "Unresolved file conflicts", count: pending?.conflicts ?? 0, icon: <FileWarning className="h-4 w-4" />, href: "/sync", tone: "text-rose-300" },
+                  { label: "Remote changes to review", count: pending?.events ?? 0, icon: <GitBranch className="h-4 w-4" />, href: "/sync", tone: "text-sky-300" },
+                  { label: "Deployments queued or running", count: pending?.deployment ?? 0, icon: <Activity className="h-4 w-4" />, href: "/deployments", tone: "text-accent-soft" },
+                ].filter((item) => item.count > 0);
+                const nextScan = pending?.lastScanAt
+                  ? new Date(new Date(pending.lastScanAt).getTime() + pending.syncIntervalSeconds * 1000)
+                  : null;
+                return (
+                  <>
+                    {work.length ? (
+                      <ul className="divide-y divide-ink-750/60">
+                        {work.map((item) => (
+                          <li key={item.label}>
+                            <Link href={item.href} className="flex items-center gap-3 py-2.5 hover:bg-ink-850/50">
+                              <span className={item.tone}>{item.icon}</span>
+                              <span className="min-w-0 flex-1 text-xs text-slate-300">{item.label}</span>
+                              <Badge tone={item.count > 0 && item.label.includes("conflict") ? "bad" : "warn"}>{item.count}</Badge>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 px-3 py-3 text-xs text-emerald-200">
+                        <CheckCircle2 className="h-4 w-4 shrink-0" /> No pending drafts, conflicts, changes, or deployments.
+                      </div>
+                    )}
+                    <div className="flex flex-wrap items-start gap-3 rounded-lg border border-ink-700/60 bg-ink-950/50 px-3 py-3">
+                      <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-accent-soft" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium text-slate-200">Scheduled server scan</p>
+                        <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
+                          {nextScan && Number.isFinite(nextScan.getTime())
+                            ? `Next poll is estimated ${relative(nextScan.toISOString())} (${nextScan.toLocaleString()}).`
+                            : "No completed scan yet. Run a discovery scan to begin the polling cycle."}
+                          {pending?.syncIntervalSeconds ? ` Repeats every ${Math.round(pending.syncIntervalSeconds / 60)} min.` : ""}
+                        </p>
+                        {pending?.lock && (
+                          <p className="mt-1 flex items-center gap-1.5 text-[11px] text-amber-300">
+                            <Clock3 className="h-3 w-3" /> Deployment lock held until {new Date(pending.lock.expiresAt).toLocaleString()}.
+                          </p>
+                        )}
+                      </div>
+                      <Link href="/discovery" className="btn-ghost shrink-0">Scan now</Link>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          )}
+        </Panel>
+        <Panel title="Schedule at a glance" subtitle="Configured polling cadence">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg border border-accent/20 bg-accent/10 p-2 text-accent-soft"><Clock3 className="h-4 w-4" /></div>
+              <div>
+                <p className="text-xs font-medium text-slate-200">Server reconciliation</p>
+                <p className="mt-0.5 text-[11px] text-slate-500">
+                  {syncOverview.data?.syncIntervalSeconds
+                    ? `Every ${Math.round(syncOverview.data.syncIntervalSeconds / 60)} minutes`
+                    : "Waiting for schedule data"}
+                </p>
+              </div>
+            </div>
+            <p className="text-[11px] leading-relaxed text-slate-500">
+              Polling is the detection mechanism; the Pterodactyl Client API does not provide file-change events. The next time shown is an estimate based on the last scan and configured interval.
+            </p>
+            <Link href="/settings" className="text-[11px] text-accent-soft hover:underline">Review server settings →</Link>
+          </div>
+        </Panel>
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
