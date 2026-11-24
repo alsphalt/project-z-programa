@@ -1,8 +1,24 @@
 # Darknote Control Center — build status
 
-Last updated: 2026-11-24 · branch `main`
+Last updated: 2026-11-25 · branch `main`
 
-## This pass — Activity Logs, the numeric bell, and a live GitHub import
+## This pass — the intro is permanent and unskippable
+
+The title card lost its only control.
+
+### What changed
+
+- **`src/components/christmas/provider.tsx`** — the `Skip intro` chip and the `dismissIntro`
+  callback are gone, together with the `onSkip` prop and the `useCallback` import they needed. The
+  introduction still plays on every launch and still hands over to the console on its own timer
+  (4.2 s, 2.6 s under reduced motion), so the branding is permanent without ever locking anyone out
+  of the panel.
+- **`src/app/globals.css`** — the `.xmas-skip` and `.xmas-skip:hover` rules were deleted with the
+  chip so no dead selectors remain.
+- **`tests/pwa-intro.test.ts`** — a new contract test fails if the label, the handler, any `<button>`
+  in the intro, or the chip styles come back. 8/8 tests pass.
+
+## Previous pass — Activity Logs, the numeric bell, and a live GitHub import
 
 The specification asked for sections the platform was missing and for proof rather than prose. Both
 were addressed, and `docs/SPEC-COMPLIANCE.md` now maps every clause to PASS / READY (unverified) /

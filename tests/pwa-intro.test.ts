@@ -103,3 +103,16 @@ test('the appearance settings section is gone, and no switch can disable the int
   assert.match(css, /\.xmas-intro\b/);
   assert.match(css, /\.xmas-brand\b/);
 });
+
+test('the introduction cannot be skipped: no control and no dismiss callback remain', () => {
+  // The title card is permanent branding. The "Skip intro" chip was removed, so
+  // the screen carries no interactive element and only the provider timer ends it.
+  const code = provider.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+  assert.ok(!/Skip intro/i.test(provider), 'the Skip intro label must not exist anywhere');
+  assert.ok(!code.includes('onSkip'), 'the intro must not receive a skip handler');
+  assert.ok(!code.includes('dismissIntro'), 'the provider must not expose a dismiss function');
+  assert.ok(!/<\/?button/.test(code), 'the intro screen must render no button');
+  assert.ok(!css.includes('.xmas-skip'), 'the skip chip styles must be deleted with the chip');
+  // It still leaves on its own, so the console is always reachable.
+  assert.match(code, /window\.setTimeout\(/);
+});

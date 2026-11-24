@@ -808,25 +808,7 @@ html[data-xmas-boot="done"] .xmas-boot {
   }
 }
 
-.xmas-skip {
-  position: absolute;
-  bottom: 1.6rem;
-  right: 1.6rem;
-  border: 1px solid rgba(223, 241, 255, 0.18);
-  background: rgba(9, 12, 22, 0.7);
-  color: rgba(223, 241, 255, 0.72);
-  border-radius: 999px;
-  padding: 0.45rem 0.95rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  transition: color 150ms ease, border-color 150ms ease;
-}
-
-.xmas-skip:hover {
-  color: #fff;
-  border-color: rgba(243, 201, 107, 0.55);
-}
+/* No skip chip: the introduction is permanent branding and has no controls. */
 
 /* Canvas snow sits above the page but below modals and the intro. */
 .xmas-snow {

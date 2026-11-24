@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { prefersReducedMotion, type ChristmasMode } from "./prefs";
 import {
   applyRenderProfile,
@@ -20,6 +20,10 @@ import {
  * honoured, so a device that had turned the intro off will show it again after
  * this build.
  *
+ * It is also not skippable: the title card runs for its full beat and then
+ * hands over to the console on its own. There is no control on the screen, so
+ * the branding cannot be clicked away.
+ *
  * Accessibility is still respected: when the operating system asks for reduced
  * motion the same introduction renders with its animation neutralised
  * (`data-motion="reduced"`), instead of being skipped entirely.
@@ -32,7 +36,6 @@ const SnowLayer = dynamic(() => import("./snow").then((module) => module.SnowLay
 interface ChristmasContextValue {
   /** Only the festive styling switch the shell needs; the intro is not optional. */
   mode: ChristmasMode;
-  dismissIntro: () => void;
 }
 
 const ChristmasContext = createContext<ChristmasContextValue | null>(null);
@@ -98,17 +101,7 @@ export function ChristmasProvider({ children }: { children: React.ReactNode }) {
     };
   }, [introOpen, reduced]);
 
-  const dismissIntro = useCallback(() => {
-    if (timer.current) window.clearTimeout(timer.current);
-    setLeaving(true);
-    releaseBootShield();
-    window.setTimeout(() => {
-      setIntroOpen(false);
-      setLeaving(false);
-    }, reduced ? 180 : 420);
-  }, [reduced]);
-
-  const value = useMemo<ChristmasContextValue>(() => ({ mode, dismissIntro }), [dismissIntro, mode]);
+  const value = useMemo<ChristmasContextValue>(() => ({ mode }), [mode]);
 
   return (
     <ChristmasContext.Provider value={value}>
@@ -116,7 +109,7 @@ export function ChristmasProvider({ children }: { children: React.ReactNode }) {
       <div className="xmas-boot" aria-hidden="true" />
       {children}
       {allowsDecorativeMotion(profile) ? <SnowLayer /> : null}
-      {introOpen ? <ChristmasIntro leaving={leaving} onSkip={dismissIntro} /> : null}
+      {introOpen ? <ChristmasIntro leaving={leaving} /> : null}
     </ChristmasContext.Provider>
   );
 }
@@ -131,8 +124,12 @@ export function useChristmas(): ChristmasContextValue {
  * The introduction: dark screen, lights, snow, the glowing wordmark, the credit,
  * then a smooth exit into the dashboard. Content is static text — nothing here
  * fetches, so it costs one paint.
+ *
+ * There is deliberately no control on this screen. The old skip chip is gone,
+ * so the title card is permanent branding: it always plays in full and only the
+ * provider's own timer hands over to the console.
  */
-function ChristmasIntro({ leaving, onSkip }: { leaving: boolean; onSkip: () => void }) {
+function ChristmasIntro({ leaving }: { leaving: boolean }) {
   return (
     <div className="xmas-intro" data-leaving={leaving ? "true" : "false"} role="presentation">
       <div className="xmas-halo" aria-hidden="true" />
@@ -149,10 +146,6 @@ function ChristmasIntro({ leaving, onSkip }: { leaving: boolean; onSkip: () => v
         <p className="xmas-credit">POWERED BY JIMMY M, TECH</p>
         <div className="xmas-ribbon mx-auto mt-8 h-px w-40 rounded-full opacity-70" aria-hidden="true" />
       </div>
-
-      <button type="button" className="xmas-skip" onClick={onSkip}>
-        Skip intro
-      </button>
     </div>
   );
 }
