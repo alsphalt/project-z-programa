@@ -1,0 +1,1091 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --surface: #05060a;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1100px 600px at 12% -10%, rgba(109, 94, 252, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 92% 0%, rgba(49, 208, 245, 0.09), transparent 55%),
+    #05060a;
+  color: #e7eaf3;
+  font-family: var(--font-sans);
+  font-feature-settings: "cv02", "cv03", "cv04";
+  overscroll-behavior-y: none;
+}
+
+::selection {
+  background: rgba(109, 94, 252, 0.35);
+}
+
+/* Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #242c40 transparent;
+}
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #242c40;
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #333d56;
+}
+
+@layer components {
+  .panel {
+    @apply rounded-xl border border-ink-700/70 bg-ink-850/80 shadow-panel backdrop-blur-sm;
+  }
+
+  .panel-flat {
+    @apply rounded-lg border border-ink-700/60 bg-ink-900/60;
+  }
+
+  .label {
+    @apply text-[11px] font-medium uppercase tracking-[0.14em] text-slate-500;
+  }
+
+  .field {
+    @apply w-full rounded-lg border border-ink-600/70 bg-ink-900/80 px-3 py-2 text-sm text-slate-100 outline-none transition
+      placeholder:text-slate-600 focus:border-accent/70 focus:ring-2 focus:ring-accent/20;
+  }
+
+  .btn {
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium
+      transition active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent text-white shadow-[0_8px_24px_-12px_rgba(109,94,252,0.9)] hover:bg-accent-soft;
+  }
+
+  .btn-ghost {
+    @apply btn border border-ink-600/70 bg-ink-800/60 text-slate-200 hover:border-ink-500 hover:bg-ink-750;
+  }
+
+  .btn-danger {
+    @apply btn border border-rose-500/40 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-ink-600/70 bg-ink-800/70 px-2.5 py-1
+      text-[11px] font-medium text-slate-300;
+  }
+
+  .table-row {
+    @apply border-b border-ink-750/70 last:border-0 hover:bg-ink-800/40;
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+    font-variant-ligatures: none;
+  }
+}
+
+input[type="checkbox"] {
+  accent-color: #6d5efc;
+}
+
+.code-scroll {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.65;
+  tab-size: 2;
+}
+
+@media (max-width: 640px) {
+  .code-scroll {
+    font-size: 12px;
+  }
+}
+
+/* ==========================================================================
+   BIGBROTHER — animated identity
+   Transform/opacity only, so Android Chromium and desktop GPUs can composite
+   the whole scene without repainting the page.
+   ========================================================================== */
+
+.bb-stage {
+  --bb-hue-a: 262;
+  --bb-hue-b: 190;
+  --bb-accent: 262;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 0%, hsl(var(--bb-hue-a) 70% 16% / 0.85), transparent 62%),
+    radial-gradient(120% 90% at 50% 100%, hsl(var(--bb-hue-b) 75% 14% / 0.8), transparent 60%),
+    #05060a;
+  transition: background 2400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bb-stage::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: conic-gradient(
+    from 0deg,
+    hsl(var(--bb-hue-a) 90% 55% / 0.12),
+    transparent 30%,
+    hsl(var(--bb-hue-b) 90% 55% / 0.1),
+    transparent 70%,
+    hsl(var(--bb-hue-a) 90% 55% / 0.12)
+  );
+  animation: bb-spin 70s linear infinite;
+  will-change: transform;
+}
+
+.bb-word-layer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max-content;
+  white-space: nowrap;
+  transform: translate3d(-50%, 0, 0);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 0.86;
+  font-size: clamp(4.5rem, 19vw, 17rem);
+  color: transparent;
+  background-image: linear-gradient(
+    180deg,
+    hsl(var(--bb-hue-a) 95% 78% / 0.95),
+    hsl(var(--bb-hue-b) 95% 62% / 0.55)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  will-change: transform, opacity;
+  pointer-events: none;
+  user-select: none;
+}
+
+.bb-word-down {
+  animation: bb-down var(--bb-cycle, 22s) linear infinite;
+}
+.bb-word-up {
+  animation: bb-up var(--bb-cycle, 22s) linear infinite;
+}
+
+.bb-depth-1 {
+  filter: blur(0px);
+  opacity: 0.92;
+}
+.bb-depth-2 {
+  filter: blur(7px);
+  opacity: 0.35;
+  font-size: clamp(4.8rem, 20vw, 18rem);
+}
+.bb-depth-3 {
+  filter: blur(18px);
+  opacity: 0.2;
+  font-size: clamp(5.2rem, 22vw, 19.5rem);
+}
+
+.bb-collision {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 130vw;
+  height: 46vh;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    closest-side,
+    hsl(var(--bb-hue-b) 100% 72% / 0.55),
+    hsl(var(--bb-hue-a) 100% 65% / 0.22),
+    transparent 72%
+  );
+  filter: blur(28px);
+  animation: bb-flash var(--bb-cycle, 22s) linear infinite;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.bb-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.28;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.14) 0.5px, transparent 0.5px);
+  background-size: 3px 3px;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+.bb-stage[data-anim="off"] .bb-word-down,
+.bb-stage[data-anim="off"] .bb-word-up,
+.bb-stage[data-anim="off"] .bb-collision,
+.bb-stage[data-anim="off"]::after {
+  animation: none;
+}
+.bb-stage[data-anim="off"] .bb-word-down,
+.bb-stage[data-anim="off"] .bb-word-up {
+  transform: translate3d(-50%, -50%, 0);
+  opacity: 0.16;
+}
+.bb-stage[data-anim="off"] .bb-collision {
+  opacity: 0.12;
+}
+.bb-stage[data-anim="off"] {
+  transition: none;
+}
+
+.bb-paused .bb-word-down,
+.bb-paused .bb-word-up,
+.bb-paused .bb-collision,
+.bb-paused::after {
+  animation-play-state: paused;
+}
+
+@keyframes bb-down {
+  0% {
+    transform: translate3d(-50%, -118vh, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate3d(-50%, -50%, 0);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-50%, 18vh, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes bb-up {
+  0% {
+    transform: translate3d(-50%, 18vh, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate3d(-50%, -50%, 0);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-50%, -118vh, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes bb-flash {
+  0%, 42%, 58%, 100% {
+    opacity: 0;
+  }
+  47% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  53% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes bb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The mist orb icon (🌫️ character, drawn so it stays crisp at 56 px). */
+.bb-orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.22), transparent 55%),
+    linear-gradient(160deg, rgba(109, 94, 252, 0.55), rgba(49, 208, 245, 0.35));
+  border: 1px solid rgba(160, 150, 255, 0.45);
+  box-shadow:
+    0 0 0 1px rgba(5, 6, 10, 0.6),
+    0 12px 34px -10px rgba(109, 94, 252, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  overflow: visible;
+  isolation: isolate;
+}
+
+.bb-orb::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: 999px;
+  border: 1px solid rgba(109, 94, 252, 0.5);
+  animation: bb-pulse 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.bb-orb::after {
+  content: "";
+  position: absolute;
+  inset: -16px;
+  border-radius: 999px;
+  background: radial-gradient(closest-side, rgba(109, 94, 252, 0.4), transparent 70%);
+  filter: blur(10px);
+  z-index: -1;
+  animation: bb-pulse 4.6s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+
+.bb-orb-mist {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  opacity: 0.95;
+}
+.bb-orb-mist span {
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  filter: blur(6px);
+  animation: bb-drift 5.5s ease-in-out infinite;
+}
+.bb-orb-mist span:nth-child(1) {
+  width: 46%;
+  height: 30%;
+  left: 12%;
+  top: 46%;
+  animation-delay: -0.4s;
+}
+.bb-orb-mist span:nth-child(2) {
+  width: 40%;
+  height: 28%;
+  right: 10%;
+  top: 40%;
+  background: rgba(214, 230, 255, 0.5);
+  animation-delay: -1.8s;
+}
+.bb-orb-mist span:nth-child(3) {
+  width: 58%;
+  height: 26%;
+  left: 20%;
+  top: 30%;
+  background: rgba(255, 255, 255, 0.4);
+  animation-delay: -3.1s;
+}
+
+@keyframes bb-pulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes bb-drift {
+  0%, 100% {
+    transform: translate3d(-6%, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(6%, -6%, 0) scale(1.08);
+  }
+}
+
+/* The floating assistant panel: rises out of the orb instead of jumping. */
+.bb-panel {
+  animation: bb-panel-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transform-origin: bottom right;
+}
+
+@keyframes bb-panel-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.bb-orb[data-open="true"] {
+  box-shadow:
+    0 0 0 1px rgba(5, 6, 10, 0.6),
+    0 0 0 2px rgba(109, 94, 252, 0.4),
+    0 14px 40px -8px rgba(109, 94, 252, 0.95);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bb-word-down,
+  .bb-word-up,
+  .bb-collision,
+  .bb-stage::after,
+  .bb-orb::before,
+  .bb-orb::after,
+  .bb-orb-mist span,
+  .bb-panel {
+    animation: none !important;
+  }
+  .bb-word-down,
+  .bb-word-up {
+    transform: translate3d(-50%, -50%, 0);
+    opacity: 0.18;
+  }
+}
+
+/**
+ * Phones: the same scene at a fraction of the compositing cost.
+ *
+ * The desktop scene is six full-width text layers — two each at blur 0, 7px and
+ * 18px — plus a 130vw × 46vh glow at blur 28px, a spinning conic gradient and a
+ * `mix-blend-mode: soft-light` grain, every one of them promoted with
+ * `will-change` and animating forever. Each blurred layer needs its own
+ * viewport-sized GPU texture, and a low-end Android device (the reported Galaxy
+ * A17 class) has very little GPU memory to give: when the compositor cannot
+ * allocate, the renderer process is killed and Chrome shows the "Aw, Snap!"
+ * page. Nothing here is worth that.
+ *
+ * On a narrow viewport the third depth layer, the grain (its own compositing
+ * pass), the spin and two of the blur radii are dropped. The word still travels
+ * and still collides — the scene reads the same on a 6" screen.
+ */
+@media (max-width: 640px) {
+  .bb-depth-3 {
+    display: none;
+  }
+  .bb-depth-2 {
+    filter: blur(3px);
+  }
+  .bb-collision {
+    filter: blur(12px);
+  }
+  .bb-stage::after {
+    animation: none;
+    will-change: auto;
+  }
+  .bb-grain {
+    display: none;
+  }
+  .bb-word-layer {
+    will-change: auto;
+  }
+}
+
+/* Message typography inside BIGBROTHER conversations. */
+.bb-prose {
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: #dfe4f2;
+}
+.bb-prose > * + * {
+  margin-top: 0.6rem;
+}
+.bb-prose h1,
+.bb-prose h2,
+.bb-prose h3 {
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: #f1f4fb;
+  letter-spacing: -0.005em;
+}
+.bb-prose ul,
+.bb-prose ol {
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.bb-prose ul {
+  list-style: disc;
+}
+.bb-prose ol {
+  list-style: decimal;
+}
+.bb-prose code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 5px;
+  padding: 0.05rem 0.3rem;
+}
+.bb-prose pre {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  background: rgba(3, 5, 11, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  overflow-x: auto;
+}
+.bb-prose pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+}
+.bb-prose a {
+  color: #a99fff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.bb-prose strong {
+  color: #fff;
+  font-weight: 650;
+}
+
+/* ============================================================================
+   CHRISTMAS EDITION
+   Festive accents layered on top of the DARKNOTE palette. Everything here is
+   opt-out: `data-christmas="off"` removes it, `data-motion="reduced"` (or the OS
+   reduced-motion setting) stops every animation. No canvas, no images — just
+   gradients and a handful of keyframes, so the cost is a few composited layers.
+   ========================================================================== */
+:root {
+  --xmas-red: #e04a5f;
+  --xmas-green: #2fa96b;
+  --xmas-gold: #f3c96b;
+  --xmas-ice: #dff1ff;
+}
+
+html[data-christmas="on"] body {
+  background:
+    radial-gradient(1100px 620px at 10% -12%, rgba(224, 74, 95, 0.14), transparent 60%),
+    radial-gradient(900px 520px at 94% -4%, rgba(47, 169, 107, 0.12), transparent 58%),
+    radial-gradient(700px 420px at 50% 108%, rgba(243, 201, 107, 0.07), transparent 60%),
+    #05060a;
+}
+
+html[data-christmas="on"] .panel {
+  box-shadow:
+    0 0 0 1px rgba(243, 201, 107, 0.06),
+    0 24px 48px -32px rgba(224, 74, 95, 0.35);
+}
+
+.xmas-ribbon {
+  background-image: linear-gradient(
+    90deg,
+    rgba(224, 74, 95, 0.55),
+    rgba(243, 201, 107, 0.55),
+    rgba(47, 169, 107, 0.55),
+    rgba(224, 74, 95, 0.55)
+  );
+  background-size: 300% 100%;
+  animation: xmas-ribbon 9s linear infinite;
+}
+
+@keyframes xmas-ribbon {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 300% 50%;
+  }
+}
+
+/* ---------------------------------------------------------------- intro */
+
+/*
+ * Boot shield for installed apps. It is server-rendered, so the very first
+ * paint of a PWA launch is already the intro backdrop instead of the console.
+ * Browser tabs never see it. Released by the provider once the intro takes
+ * over; the 9s animation is a safety net if hydration never happens.
+ */
+.xmas-boot {
+  display: none;
+}
+
+@media (display-mode: standalone), (display-mode: window-controls-overlay), (display-mode: fullscreen) {
+  .xmas-boot {
+    display: grid;
+    position: fixed;
+    inset: 0;
+    z-index: 119;
+    background:
+      radial-gradient(900px 600px at 50% 40%, rgba(12, 16, 28, 0.96), rgba(3, 4, 9, 0.99) 70%),
+      #03040a;
+    animation: xmas-boot-lift 240ms ease-out 9s forwards;
+  }
+}
+
+html[data-xmas-boot="done"] .xmas-boot {
+  display: none;
+}
+
+@keyframes xmas-boot-lift {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.xmas-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(900px 600px at 50% 40%, rgba(12, 16, 28, 0.96), rgba(3, 4, 9, 0.99) 70%),
+    #03040a;
+  animation: xmas-intro-in 420ms ease-out both;
+}
+
+.xmas-intro[data-leaving="true"] {
+  animation: xmas-intro-out 620ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes xmas-intro-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes xmas-intro-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+.xmas-brand {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  font-size: clamp(2rem, 9vw, 5.2rem);
+  line-height: 1;
+  color: #f7fbff;
+  text-shadow:
+    0 0 18px rgba(223, 241, 255, 0.45),
+    0 0 60px rgba(109, 94, 252, 0.35),
+    0 0 120px rgba(224, 74, 95, 0.25);
+  animation: xmas-brand-in 1500ms cubic-bezier(0.16, 1, 0.3, 1) 700ms both;
+}
+
+.xmas-brand span {
+  background: linear-gradient(180deg, #ffffff, #dff1ff 40%, #f3c96b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes xmas-brand-in {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+    filter: blur(14px);
+    letter-spacing: 0.55em;
+  }
+  60% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    letter-spacing: 0.22em;
+  }
+}
+
+.xmas-credit {
+  margin-top: 1.1rem;
+  font-size: clamp(0.6rem, 2.4vw, 0.85rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: rgba(223, 241, 255, 0.72);
+  animation: xmas-fade-up 900ms ease-out 1900ms both;
+}
+
+@keyframes xmas-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.xmas-halo {
+  position: absolute;
+  width: min(78vw, 620px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(224, 74, 95, 0.16),
+    rgba(243, 201, 107, 0.12),
+    rgba(47, 169, 107, 0.14),
+    rgba(109, 94, 252, 0.16),
+    rgba(224, 74, 95, 0.16)
+  );
+  filter: blur(38px);
+  animation: xmas-halo 6s linear infinite;
+}
+
+@keyframes xmas-halo {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* String of lights across the top of the intro and the shell. */
+.xmas-lights {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 46px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 3%;
+  pointer-events: none;
+}
+
+.xmas-lights i {
+  width: 7px;
+  height: 7px;
+  margin-top: 12px;
+  border-radius: 999px;
+  background: var(--xmas-gold);
+  box-shadow: 0 0 12px 3px rgba(243, 201, 107, 0.55);
+  animation: xmas-twinkle 2.4s ease-in-out infinite;
+}
+
+.xmas-lights i:nth-child(3n) {
+  background: var(--xmas-red);
+  box-shadow: 0 0 12px 3px rgba(224, 74, 95, 0.5);
+  animation-delay: 0.6s;
+}
+
+.xmas-lights i:nth-child(3n + 1) {
+  background: var(--xmas-green);
+  box-shadow: 0 0 12px 3px rgba(47, 169, 107, 0.5);
+  animation-delay: 1.2s;
+}
+
+@keyframes xmas-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0) scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(2px) scale(1.15);
+  }
+}
+
+.xmas-skip {
+  position: absolute;
+  bottom: 1.6rem;
+  right: 1.6rem;
+  border: 1px solid rgba(223, 241, 255, 0.18);
+  background: rgba(9, 12, 22, 0.7);
+  color: rgba(223, 241, 255, 0.72);
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.xmas-skip:hover {
+  color: #fff;
+  border-color: rgba(243, 201, 107, 0.55);
+}
+
+/* Canvas snow sits above the page but below modals and the intro. */
+.xmas-snow {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* ------------------------------------------------------- reduced motion */
+html[data-motion="reduced"] .xmas-ribbon,
+html[data-motion="reduced"] .xmas-halo,
+html[data-motion="reduced"] .xmas-lights i,
+html[data-motion="reduced"] .xmas-brand,
+html[data-motion="reduced"] .xmas-credit {
+  animation: none !important;
+}
+
+html[data-motion="reduced"] .xmas-snow {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xmas-ribbon,
+  .xmas-halo,
+  .xmas-lights i,
+  .xmas-brand,
+  .xmas-credit,
+  .xmas-intro,
+  .xmas-intro[data-leaving="true"] {
+    animation: none !important;
+  }
+  .xmas-snow {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Android rendering budget
+   --------------------------------------------------------------------------
+   A mid-range Android phone gives this app roughly one GPU process and a few
+   hundred megabytes of renderer heap. Everything below is about spending that
+   budget on the dashboard instead of on decoration.
+
+   The rules are deliberately CSS-only: they cannot leak, they cannot run in a
+   timer, and they cost one style recalculation when the viewport changes.
+   ========================================================================== */
+
+/**
+ * 1. No backdrop blur on a phone.
+ *
+ * `backdrop-filter: blur()` on a fixed sidebar or a sticky header makes the
+ * compositor re-read and re-blur the whole surface for every frame that scrolls
+ * underneath it. On desktop that is a nice effect; on a phone it is the single
+ * most expensive thing on the page and a known source of dropped frames, GPU
+ * memory growth and renderer kills. The surfaces keep their dark tint, so the
+ * layout and contrast are unchanged — only the blur is gone.
+ */
+@media (max-width: 1023px) {
+  .backdrop-blur,
+  .backdrop-blur-sm,
+  .backdrop-blur-md,
+  .backdrop-blur-lg,
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl,
+  .backdrop-blur-3xl,
+  .panel,
+  .panel-flat {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* Explicit OS preference, on any screen size. */
+@media (prefers-reduced-transparency: reduce) {
+  .backdrop-blur,
+  .backdrop-blur-sm,
+  .backdrop-blur-md,
+  .backdrop-blur-lg,
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl,
+  .backdrop-blur-3xl,
+  .panel {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* The in-app "reduced" appearance also drops it: the user asked for calm. */
+html[data-motion="reduced"] .backdrop-blur,
+html[data-motion="reduced"] .backdrop-blur-sm,
+html[data-motion="reduced"] .backdrop-blur-xl,
+html[data-motion="reduced"] .panel {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/**
+ * 2. Off-screen rows are not laid out or painted.
+ *
+ * Log tails, file listings, error rows and project files all render hundreds of
+ * rows; on a phone only six or seven are ever visible. `content-visibility: auto`
+ * skips the engine work for the rest, and `contain-intrinsic-size` keeps the
+ * scrollbar honest so the page does not jump while scrolling.
+ */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 40px;
+}
+.cv-auto-tall {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 96px;
+}
+
+/**
+ * 3. Decoration stops when the document is hidden.
+ *
+ * Chrome throttles timers in a background tab but keeps composited animations
+ * alive; on Android that is CPU (and therefore battery) spent on a screen nobody
+ * is looking at. `data-doc-hidden` is set by the crash sentinel.
+ */
+html[data-doc-hidden="true"] .xmas-ribbon,
+html[data-doc-hidden="true"] .xmas-halo,
+html[data-doc-hidden="true"] .xmas-lights i,
+html[data-doc-hidden="true"] .xmas-brand,
+html[data-doc-hidden="true"] .bb-orb::before,
+html[data-doc-hidden="true"] .bb-orb::after,
+html[data-doc-hidden="true"] .bb-orb-mist span,
+html[data-doc-hidden="true"] .bb-stage::after,
+html[data-doc-hidden="true"] .bb-collision,
+html[data-doc-hidden="true"] .bb-word-down,
+html[data-doc-hidden="true"] .bb-word-up,
+html[data-doc-hidden="true"] .animate-spin,
+html[data-doc-hidden="true"] .animate-pulse {
+  animation-play-state: paused !important;
+}
+
+/**
+ * 4. The BIGBROTHER identity on small screens.
+ *
+ * It draws six copies of the word, each with a blur filter, plus a grain layer
+ * with `mix-blend-mode`. The blurred copies are what force large intermediate
+ * surfaces; at phone width the effect is barely visible behind the panel anyway.
+ * The two outermost (18px blur) layers and the blend-mode grain are dropped, and
+ * the remaining cycle is slowed so the compositor wakes less often.
+ */
+@media (max-width: 767px) {
+  .bb-depth-3,
+  .bb-grain {
+    display: none !important;
+  }
+  .bb-depth-2 {
+    filter: blur(4px);
+    opacity: 0.28;
+  }
+  .bb-collision {
+    filter: blur(16px);
+  }
+  .bb-stage {
+    --bb-cycle: 34s;
+  }
+  .bb-orb::after,
+  .bb-orb-mist span {
+    filter: blur(4px);
+  }
+
+  /**
+   * The introduction halo is a rotating conic gradient under a 38px blur — a
+   * viewport-scale filter texture that is rebuilt on every launch, before the
+   * console has even painted. It is the heaviest paint in the app and it plays
+   * on every page, so a device that cannot allocate the layer dies during boot
+   * and Chrome shows "Aw, Snap!" with no page underneath.
+   *
+   * A plain radial gradient draws the same glow with no filter pass and no
+   * animation; the intro is a title card, not a showcase for the compositor.
+   */
+  .xmas-halo {
+    animation: none;
+    filter: none;
+    background: radial-gradient(
+      circle at 50% 45%,
+      rgba(109, 94, 252, 0.22),
+      rgba(243, 201, 107, 0.12) 42%,
+      rgba(224, 74, 95, 0.08) 62%,
+      transparent 72%
+    );
+  }
+
+  /* The wordmark still fades in, but without a 14px blur pass on phones. */
+  .xmas-brand {
+    animation-name: xmas-brand-in-lite;
+  }
+}
+
+@keyframes xmas-brand-in-lite {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+    letter-spacing: 0.42em;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    letter-spacing: 0.22em;
+  }
+}
+
+/**
+ * 5. User-level and OS-level reduced motion, for every decorative animation —
+ *    including the ones that only run inside a component.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .bb-collision,
+  .bb-word-down,
+  .bb-word-up,
+  .bb-stage::after,
+  .bb-orb::before,
+  .bb-orb::after,
+  .bb-orb-mist span,
+  .xmas-ribbon,
+  .xmas-halo,
+  .xmas-lights i {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto !important;
+  }
+}
+
+html[data-motion="reduced"] .bb-collision,
+html[data-motion="reduced"] .bb-word-down,
+html[data-motion="reduced"] .bb-word-up,
+html[data-motion="reduced"] .bb-orb::before,
+html[data-motion="reduced"] .bb-orb::after,
+html[data-motion="reduced"] .bb-orb-mist span {
+  animation: none !important;
+}
+
+/* ==========================================================================
+   Diagnostic render profile — `?profile=safe` and `?profile=reduced`
+   --------------------------------------------------------------------------
+   The reversible switch used to find what makes a device slow, without
+   disabling a feature. It is applied to <html data-profile> by
+   `src/lib/perf/profile.ts` and remembered per device, so a phone can be put
+   into safe mode and left there while a problem is bisected:
+   `?profile=safe` → `?profile=reduced` → `?profile=full` to clear it.
+
+   Decorative motion is the only thing removed here. Every page still loads its
+   data once, on demand; nothing about the interface or the branding changes.
+   ========================================================================== */
+html[data-profile="safe"] *,
+html[data-profile="reduced"] * {
+  animation: none !important;
+}
+
+/* The orb is fixed, so its three blurred, endlessly drifting mist spans are
+   composited on top of every page for a motion most phones cannot resolve. */
+html[data-profile="safe"] .bb-orb-mist,
+html[data-profile="reduced"] .bb-orb-mist {
+  display: none;
+}
