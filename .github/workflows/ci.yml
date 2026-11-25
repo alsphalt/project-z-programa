@@ -1,0 +1,58 @@
+name: CI
+
+# Typecheck, test and build on every push. The unit/integration suite runs on the
+# embedded PostgreSQL (PGlite) with no services, so it is fast and hermetic; the
+# PostgreSQL-specific file skips itself when DARKNOTE_TEST_PG_URL is absent,
+# which is what the 11 skipped tests are.
+#
+# Nothing here talks to a Pterodactyl panel or to GitHub: a build must never need
+# production credentials.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      # A test-only secret: sessions and the credential store need one, and it
+      # must never be the value a deployment uses.
+      DARKNOTE_SECRET: ci-only-secret-value-long-enough-for-aes-256-gcm
+      DARKNOTE_DB_DRIVER: pglite
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload the build's route manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: route-manifest
+          path: .next/app-build-manifest.json
+          if-no-files-found: ignore
+          retention-days: 3
